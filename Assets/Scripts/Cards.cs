@@ -1,14 +1,15 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using DG.Tweening;
+
 public class Cards : MonoBehaviour
 {
     public CardData cardData;
    
 
   
-    public TextMeshProUGUI cardNameText;
-    public TextMeshProUGUI descriptionText;
+
 
     // Feedback affect 
     public float moveUpDistance = 10f;
@@ -18,23 +19,46 @@ public class Cards : MonoBehaviour
     public Vector3 vfxoffset;
     public AudioSource audioSource;
 
-
+    // Card states
+    public bool IsFaceUp { get; private set; }
+    public bool IsSelected { get; private set; }
 
     private void Start()
     {
-        UpdateCardData();
+       
         startPos = transform.position;
 
     }
-    void Update()
+
+    public Tween Flip(bool faceUp)
     {
+        if (IsFaceUp == faceUp) return null;
+
+        IsFaceUp = faceUp;
+
+        return transform
+            
+            .DORotate(new Vector3(0,  0f, faceUp ? 180f : 0f), 0.3f)
+            .SetEase(Ease.OutQuad);
+            
+
+    }
+
+    public void Select()
+    {
+        IsSelected = true;
+    }
+
+    public void Deselect()
+    {
+        IsSelected = false;
+    }
+
+
  
-    }
-    public void UpdateCardData()
-    {
-        cardNameText.text = cardData.cardName;
-        descriptionText.text = cardData.description;
-    }
+
+
+
     public void CardFeedback()
     {
        
