@@ -12,10 +12,14 @@ public class RollDice : MonoBehaviour
     public bool Iscount = false;
     public bool Isrolled;
     public bool IsCountingAnimation;
+  
+
     public CardManager cardManager;
 
     public AudioSource audioSource;
     public AudioClip dicesound;
+
+    public int turn = 0;
 
     private void Start()
     {
@@ -28,7 +32,9 @@ public class RollDice : MonoBehaviour
     }
     public void RollTheDice()
     {   // Prevent new rolls while counting
+
         if (IsCountingAnimation) return;
+        Point.instance.ResetUI();
         Iscount = true;
         //disable rolling if the dice is still moving
         if (rb.linearVelocity.magnitude > 0.1f ||rb.angularVelocity.magnitude > 0.1f)
@@ -44,9 +50,12 @@ public class RollDice : MonoBehaviour
         forcez = Random.Range(0, maxrandomforcevalue);
         rb.AddForce(Vector3.up * rollingforce);
         rb.AddTorque(forcex, forcey, forcez);
+        
         Isrolled = true;
-       
-
+      
+        turn++;
+        
+        
 
 
 
@@ -59,9 +68,9 @@ public class RollDice : MonoBehaviour
        
         if (Isrolled)
         {
-          
+
             cardManager.Checkcard();
-            
+
 
         }
        

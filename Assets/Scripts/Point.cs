@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.iOS.LowLevel;
+
 public class Point : MonoBehaviour
 {
+    
     RollDice dice;
 
     public TMP_Text pointText;
@@ -12,20 +13,17 @@ public class Point : MonoBehaviour
     public TMP_Text totalText;
     public TMP_Text multiplicationsignText;
     public TMP_Text equalsignText;
-
+    public TMP_Text turnText;
     // Initial multiplier and total
     public int multiplier = 10;
     public int total = 0;
 
- 
-
-
     // Coroutine reference for counting animation
     private Coroutine countCoroutine;
-    private int lastProcessedFace = 0;
+    private int lastProcessedFace = -1;
+    private int lastturn = -1;
 
-
-    //Sound
+    // Sound
     public AudioSource audioSource;
     public AudioClip pointsound;
     public AudioClip totalpoint;
@@ -33,91 +31,188 @@ public class Point : MonoBehaviour
     // History storage (latest first)
     public TMP_Text[] rollHistoryTexts;
     private readonly List<int> rollHistory = new List<int>(5);
+    public int displayValue = 0;
 
+    public static Point instance;
     private void Awake()
     {
         dice = FindAnyObjectByType<RollDice>();
+        instance = this;
     }
 
-   
     void Update()
     {
-
+        // Guard early against missing dice reference
         if (dice == null) return;
-        // this value will be showed in UI which not affect on the face number (Eg. when displayvalue = 13 but still facenum = 3
-        int displayValue = dice.facenum;
-        // no face showing -> reset UI once
-        if (dice.facenum == 0)
+
+        // Update turn UI
+        if (turnText != null)
+            turnText.text = "Turn " + dice.turn.ToString();
+
+    }
+
+  
+
+    public void Checkface(int face)
+    {
+        if (face == 6)
         {
-            
-            if (lastProcessedFace != 0 &&dice.Isrolled)
-            {
-                Debug.Log("Resetting point display.");
-                pointText.text = "";
-                multiplierText.text = "";
-                totalText.text = "";
-                multiplicationsignText.text = "";
-                equalsignText.text = "";
-                lastProcessedFace = 0;
-            }
-            return;
-        }
-
-        // If same face already processed, do nothing
-        if (dice.facenum == lastProcessedFace) return;
-
-        // New face value: process once
-        lastProcessedFace = dice.facenum;
-
-        if (dice.facenum == 6)
-        {
+            displayValue = face;
             multiplier = 2;
-            dice.facenum=6;
             // Text effect
-            multiplierText.color = Color.green;
-            multiplierText.fontSize = 100;
+            if (multiplierText != null)
+            {
+                multiplierText.color = Color.green;
+                multiplierText.fontSize = 100;
+            }
         }
-        else if (dice.facenum == 3)
+        else if (face == 3)
         {
-           
-            displayValue = dice.facenum+10;
+            displayValue = face + 10;
             multiplier = 10;
             // Text effect
-            pointText.color = Color.red;
-            pointText.fontSize = 100;
+            if (pointText != null)
+            {
+                pointText.color = Color.red;
+                pointText.fontSize = 80;
+            }
+        }
+        else if (face==1)
+        {
+            displayValue = face;
+            multiplier = 10;
+            total+=20;
+        }
+        else if (face == 2)
+        {
+            displayValue = 1;
+            multiplier = 10;
+            if (pointText != null)
+            {
+                pointText.color = Color.red;
+                pointText.fontSize = 80;
+            }
+        }
+        else if (face == 4)
+        {
+            displayValue = face;
+            multiplier = 10;
+            total-=12;
+            if (pointText != null)
+            {
+                pointText.color = Color.red;
+                pointText.fontSize = 80;
+            }
+        }
+        else if (face == 5)
+        {
+            displayValue = face;
+            multiplier = 15;
+            if (pointText != null)
+            {
+                pointText.color = Color.green;
+                pointText.fontSize = 100;
+            }
         }
         else
         {
+            displayValue = face;
             multiplier = 10;
-            // Text effect
-            multiplierText.color = Color.white;
-            multiplierText.fontSize = 90;
-            pointText.color = Color.white;
-            pointText.fontSize = 90;
+            // Text effect reset
+            if (multiplierText != null)
+            {
+                multiplierText.color = Color.white;
+                multiplierText.fontSize = 90;
+            }
 
-
+            if (pointText != null)
+            {
+                pointText.color = Color.white;
+                pointText.fontSize = 90;
+            }
         }
 
-        total = displayValue * multiplier;
-        // Using TMP Animator component
-        pointText.text = "<jump>" + displayValue.ToString();
-        multiplierText.text = "<jump>" + multiplier.ToString();
-        multiplicationsignText.text = "<shake>" + "x";
-        equalsignText.text = "<shake>" + "=";
-    
-
-        // Only start counting if not already running
-        if (countCoroutine == null)
-        {
-            countCoroutine = StartCoroutine(CountTotal(total));
-        }
-        AddToHistory(total);
+        Debug.Log("face number is: " + face);
+        Showtoltalpoint();
     }
+
+    private void Showtoltalpoint()
+    {
+        if (pointText != null) pointText.text = "<jump>" + displayValue.ToString();
+        if (multiplierText != null) multiplierText.text = "<jump>" + multiplier.ToString();
+        if (multiplicationsignText != null) multiplicationsignText.text = "<shake>" + "x";
+        if (equalsignText != null) equalsignText.text = "<shake>" + "=";
+        // Not used in updated flow; kept for compatibility
+        total += displayValue * multiplier;
+        if (countCoroutine == null)
+            countCoroutine = StartCoroutine(CountTotal(total));
+        AddToHistory(total);
+
+
+    }
+    public void ResetUI()
+    {
+               total = 0;
+        // Text effect reset
+        if (multiplierText != null)
+        {
+            multiplierText.color = Color.white;
+            multiplierText.fontSize = 80;
+        }
+
+        if (pointText != null)
+        {
+            pointText.color = Color.white;
+            pointText.fontSize = 80;
+        }
+
+
+    }
+    IEnumerator CountTotal(int target)
+    {
+
+        // Prevent new rolls while counting
+        if (dice != null)
+        {
+            dice.IsCountingAnimation = true;
+        }
+
+        int current = 0;
+        while (current <= target)
+        {
+            if (totalText != null)
+                totalText.text = "<grow>" + $"{current}";
+
+            if (audioSource != null && pointsound != null)
+                audioSource.PlayOneShot(pointsound);
+
+            current++;
+            yield return new WaitForSeconds(0.03f); // speed of counting
+        }
+
+        if (audioSource != null && totalpoint != null)
+            audioSource.PlayOneShot(totalpoint);
+
+        if (totalText != null)
+        {
+            totalText.fontSize = 120; // final size
+            totalText.color = Color.yellow; // final color
+        }
+
+        if (dice != null)
+        {
+            dice.IsCountingAnimation = false;
+            HandManager.Instance.OnPointAnimationFinished();
+        }
+
+        countCoroutine = null;
+    }
+
     private void AddToHistory(int value)
     {
         // keep latest at index 0
         rollHistory.Insert(0, value);
-        
+
         while (rollHistory.Count > 5) rollHistory.RemoveAt(rollHistory.Count - 1);
         // update UI if fields are assigned
         if (rollHistoryTexts != null && rollHistoryTexts.Length > 0)
@@ -135,30 +230,5 @@ public class Point : MonoBehaviour
                 }
             }
         }
-    }
-    IEnumerator CountTotal(int target)
-    {
-        // Prevent new rolls while counting
-        if (dice != null)
-        {
-            dice.IsCountingAnimation = true;
-        }
-        int current = 0;
-
-        while (current <= target)
-        {
-            totalText.text = "<grow>"+ $"{current}";
-            audioSource.PlayOneShot(pointsound);
-            current++;
-            yield return new WaitForSeconds(0.03f); // speed of counting
-        }
-        audioSource.PlayOneShot(totalpoint);
-        totalText.fontSize = 120; // final size
-        totalText.color= Color.yellow; // final color
-        if (dice != null)
-        {
-            dice.IsCountingAnimation = false;
-        }
-        countCoroutine = null;
     }
 }

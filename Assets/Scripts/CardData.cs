@@ -3,8 +3,7 @@ using UnityEngine;
 
 public class CardData : ScriptableObject
 {
-    public string cardName;
-    public string description;
+    
     public int cardnum;
     public GameObject vfx;
     public AudioClip audioClip;

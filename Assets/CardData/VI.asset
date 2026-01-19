@@ -10,11 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db61c2a1eca93d940ad1de355cc2ce7d, type: 3}
-  m_Name: Thethird
+  m_Name: VI
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: The Third
-  description: If dice result is 3, then add +10 to Points (Points = Points + 10)
-    and recompute Total
-  cardnum: 3
-  vfx: {fileID: 3687095683962505668, guid: c2d60718a24fb7949890d6ee5bda8c85, type: 3}
-  audioClip: {fileID: 8300000, guid: 6f8c4def6cff6b84c9ff7cd3e19fd88c, type: 3}
+  cardnum: 6
+  vfx: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
+  audioClip: {fileID: 8300000, guid: 5257b73575238ba43aa4844c88fb6eda, type: 3}

@@ -20,13 +20,15 @@ public class Cards : MonoBehaviour
     public AudioSource audioSource;
 
     // Card states
+    public GameObject SourcePrefab { get; set; }
     public bool IsFaceUp { get; private set; }
     public bool IsSelected { get; private set; }
 
     private void Start()
     {
        
-        startPos = transform.position;
+       
+       
 
     }
 
@@ -69,6 +71,7 @@ public class Cards : MonoBehaviour
         GameObject instance = Instantiate(cardData.vfx, transform.position + vfxoffset, Quaternion.identity);
         audioSource.PlayOneShot(cardData.audioClip);
         Destroy(instance, cardData.vfx.GetComponent<ParticleSystem>().main.duration);
+        startPos = transform.position;
         StartCoroutine(MoveUp());
 
 

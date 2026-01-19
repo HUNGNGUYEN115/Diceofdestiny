@@ -24,7 +24,8 @@ public class FaceDetector : MonoBehaviour
             dice.GetComponent<Rigidbody>().angularVelocity.sqrMagnitude < Threshold * Threshold)
             {
                 dice.facenum=int.Parse(other.gameObject.name);
-                
+                Point.instance.Checkface(dice.facenum);
+
                 dice.Iscount = false;
             }
         }

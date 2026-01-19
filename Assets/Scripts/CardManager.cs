@@ -1,9 +1,14 @@
 using UnityEngine;
 using System.Collections;
-public class CardManager : Cards
+using NUnit.Framework;
+using System.Collections.Generic;
+
+public class CardManager : MonoBehaviour
 {
     public RollDice dice;
-    public Cards[] deck = new Cards[5];
+    public HandManager handManager;
+
+    public List<Cards> deck = new();
 
     public bool Ischeck;
 
@@ -12,27 +17,28 @@ public class CardManager : Cards
     {
         Ischeck = false;
         
+
     }
     void Update()
     {
-
+        deck = handManager.selectedCards.ConvertAll(card => card.GetComponent<Cards>());
     }
     public void Checkcard()
     {
 
-        for (int i = 0; i < deck.Length; i++)
+        for (int i = 0; i < deck.Count; i++)
         {
-              
-            if (dice.facenum == deck[i].cardData.cardnum  && dice.Isrolled&&!dice.Iscount)
-            {
 
+            if (dice.facenum == deck[i].cardData.cardnum && dice.Isrolled && !dice.Iscount)
+            {
+                
                 deck[i].CardFeedback();
                 dice.Isrolled = false;
 
 
             }
-            
-            
+
+
 
 
 
@@ -40,5 +46,5 @@ public class CardManager : Cards
 
 
     }
-    
+
 }

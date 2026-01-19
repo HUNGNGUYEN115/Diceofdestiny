@@ -4,22 +4,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 using UnityEngine.InputSystem;
+using System.Diagnostics.CodeAnalysis;
 
 public class HandManager : MonoBehaviour
 {
     [SerializeField] private int MaxHandSize;
-    [SerializeField] private GameObject[] cardPrefabs;
+    [SerializeField] private List<GameObject> cardPrefabs;
     [SerializeField] private SplineContainer splinecontainer;
     [SerializeField] private Transform cardspawnppoint;
 
-    private List<GameObject> handCards = new();
-    [SerializeField] private Transform[] targetPositions; // size = 2
+    public List<GameObject> handCards = new();
+    [SerializeField] private List<Transform> targetPositions; // size = 2
     [SerializeField] private float moveDuration = 1f;
 
-    private List<Cards> selectedCards = new();
+    public List<Cards> selectedCards = new();
     public static HandManager Instance;
 
+    public RollDice dice;
+    public bool ischoosecard;
 
+
+    void Start()
+    {
+        StartCoroutine(DrawCardsRoutine(MaxHandSize));
+        ischoosecard=true;
+         
+    }
     private void Awake()
     {
         Instance = this;
@@ -27,15 +37,18 @@ public class HandManager : MonoBehaviour
 
     private void Update()
     {
+
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             HandleClick();
         }
+        
     }
 
     void HandleClick()
     {
-        if (selectedCards.Count >= 2) return;
+        /*if (selectedCards.Count >= 2) return*/;
 
         Ray ray = Camera.main.ScreenPointToRay(
             Mouse.current.position.ReadValue()
@@ -45,36 +58,53 @@ public class HandManager : MonoBehaviour
         {
             Cards card = hit.collider.GetComponent<Cards>();
             if (card == null || card.IsSelected) return;
-
-            SelectCard(card);
-    }
+            if (dice.turn == 3)
+            {
+                SelectCard(card, 3);
+            }
+            else if(dice.turn == 0)
+            {
+                SelectCard(card, 2);
+            }
+        }
     }
  
-    void SelectCard(Cards card)
+    void SelectCard(Cards card,int turn)
     {
         card.transform.DOMoveY(card.transform.position.y + 1.5f, 0.15f);
 
         card.Select();
         card.Flip(true);
+        
         selectedCards.Add(card);
-
+       
         Tween flipTween = card.Flip(true);
 
-        if (selectedCards.Count == 2)
+        if (selectedCards.Count == turn)
         {
+            
+
+            
             Invoke(nameof(ResolveSelection), 0.6f);
+         
         }
+
     }
     void ResolveSelection()
     {
         // Move selected cards to target positions
         for (int i = 0; i < selectedCards.Count; i++)
         {
+       
             selectedCards[i].transform.DOMove(
                 targetPositions[i].position,
                 moveDuration
             );
+            
+            //targetPositions.RemoveAt(i);
+            
         }
+        StartCoroutine(RemoveSelectedCardsRoutine());
 
         // Move unselected cards back to spawn
         foreach (var cardGO in handCards)
@@ -113,17 +143,21 @@ public class HandManager : MonoBehaviour
     {
         for (int i = 0; i < amount; i++)
         {
-            DrawCard();
+            
+                DrawCard();
+            
+            
             yield return new WaitForSeconds(0.25f); // delay between cards
         }
     }
     private void DrawCard()
     {
+        if (dice.IsCountingAnimation) return;
         if (handCards.Count >= MaxHandSize) return;
 
         // Get available prefabs that are not in hand yet
         List<int> availableIndexes = new List<int>();
-        for (int i = 0; i < cardPrefabs.Length; i++)
+        for (int i = 0; i < cardPrefabs.Count; i++)
         {
             bool inHand = false;
             foreach (var card in handCards)
@@ -140,22 +174,62 @@ public class HandManager : MonoBehaviour
         if (availableIndexes.Count == 0) return; // no more unique cards
 
         int randomIndex = availableIndexes[Random.Range(0, availableIndexes.Count)];
-
+        GameObject prefab = cardPrefabs[randomIndex];
         GameObject newCard = Instantiate(cardPrefabs[randomIndex], splinecontainer.transform);
         newCard.transform.position = cardspawnppoint.position;
         newCard.transform.localScale *=0.85f;
+        Cards cardComponent = newCard.GetComponent<Cards>();
+        cardComponent.SourcePrefab  = prefab;
         handCards.Add(newCard);
         UpdateCardPositions();
     }
 
 
-    void Start()
+   
+
+    IEnumerator RemoveSelectedCardsRoutine()
     {
-        StartCoroutine(DrawCardsRoutine(MaxHandSize));
+        yield return new WaitForSeconds(moveDuration);
+
+        foreach (var card in selectedCards)
+        {
+            // Remove from hand
+            handCards.Remove(card.gameObject);
+
+            // Remove prefab from future draws
+            cardPrefabs.Remove(card.SourcePrefab);
+
+
+        }
+
+        //selectedCards.Clear();
+    }
+    void ClearHand()
+    {
+        foreach (var cardGO in handCards)
+        {
+            Destroy(cardGO);
+        }
+
+        handCards.Clear();
+        //selectedCards.Clear();
     }
 
-    
-  
+    public void OnPointAnimationFinished()
+    {
+        if (dice.turn == 3 && ischoosecard)
+        {
+            
+
+            ClearHand();
+            StartCoroutine(DrawCardsRoutine(MaxHandSize));
+            ischoosecard = false;
+        }
+    }
+
+
+
+
 
 
 }
