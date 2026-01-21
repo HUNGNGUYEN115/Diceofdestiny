@@ -20,8 +20,6 @@ public class Point : MonoBehaviour
 
     // Coroutine reference for counting animation
     private Coroutine countCoroutine;
-    private int lastProcessedFace = -1;
-    private int lastturn = -1;
 
     // Sound
     public AudioSource audioSource;
@@ -34,6 +32,9 @@ public class Point : MonoBehaviour
     public int displayValue = 0;
 
     public static Point instance;
+
+    public List<Cards> selectedcards = new();
+
     private void Awake()
     {
         dice = FindAnyObjectByType<RollDice>();
@@ -46,94 +47,108 @@ public class Point : MonoBehaviour
         if (dice == null) return;
 
         // Update turn UI
-        if (turnText != null)
-            turnText.text = "Turn " + dice.turn.ToString();
+        //if (turnText != null)
+        //    turnText.text = "Turn " + dice.turn.ToString();
 
+        selectedcards = HandManager.Instance.selectedCards.ConvertAll(card => card.GetComponent<Cards>());
     }
 
-  
+
+
 
     public void Checkface(int face)
     {
-        if (face == 6)
+        for (int i = 0; i < selectedcards.Count; i++)
         {
-            displayValue = face;
-            multiplier = 2;
-            // Text effect
-            if (multiplierText != null)
+            if (face == selectedcards[i].cardData.cardnum)
             {
-                multiplierText.color = Color.green;
-                multiplierText.fontSize = 100;
-            }
-        }
-        else if (face == 3)
-        {
-            displayValue = face + 10;
-            multiplier = 10;
-            // Text effect
-            if (pointText != null)
-            {
-                pointText.color = Color.red;
-                pointText.fontSize = 80;
-            }
-        }
-        else if (face==1)
-        {
-            displayValue = face;
-            multiplier = 10;
-            total+=20;
-        }
-        else if (face == 2)
-        {
-            displayValue = 1;
-            multiplier = 10;
-            if (pointText != null)
-            {
-                pointText.color = Color.red;
-                pointText.fontSize = 80;
-            }
-        }
-        else if (face == 4)
-        {
-            displayValue = face;
-            multiplier = 10;
-            total-=12;
-            if (pointText != null)
-            {
-                pointText.color = Color.red;
-                pointText.fontSize = 80;
-            }
-        }
-        else if (face == 5)
-        {
-            displayValue = face;
-            multiplier = 15;
-            if (pointText != null)
-            {
-                pointText.color = Color.green;
-                pointText.fontSize = 100;
-            }
-        }
-        else
-        {
-            displayValue = face;
-            multiplier = 10;
-            // Text effect reset
-            if (multiplierText != null)
-            {
-                multiplierText.color = Color.white;
-                multiplierText.fontSize = 90;
-            }
+                if (face == 6)
+                {
+                    displayValue = face;
+                    multiplier = 2;
+                    // Text effect
+                    if (multiplierText != null)
+                    {
+                        multiplierText.color = Color.green;
+                        multiplierText.fontSize = 100;
+                    }
+                }
+                else if (face == 3)
+                {
+                    displayValue = face + 10;
+                    multiplier = 10;
+                    // Text effect
+                    if (pointText != null)
+                    {
+                        pointText.color = Color.red;
+                        pointText.fontSize = 80;
+                    }
+                }
+                else if (face == 1)
+                {
+                    displayValue = face;
+                    multiplier = 10;
+                    total += 20;
+                }
+                else if (face == 2)
+                {
+                    displayValue = 1;
+                    multiplier = 10;
+                    if (pointText != null)
+                    {
+                        pointText.color = Color.red;
+                        pointText.fontSize = 80;
+                    }
+                }
+                else if (face == 4)
+                {
+                    displayValue = face;
+                    multiplier = 10;
+                    total -= 12;
+                    if (pointText != null)
+                    {
+                        pointText.color = Color.red;
+                        pointText.fontSize = 80;
+                    }
+                }
+                else if (face == 5)
+                {
+                    displayValue = face;
+                    multiplier = 15;
+                    if (pointText != null)
+                    {
+                        pointText.color = Color.green;
+                        pointText.fontSize = 100;
+                    }
 
-            if (pointText != null)
+                }
+
+
+
+
+
+            }
+            else
             {
-                pointText.color = Color.white;
-                pointText.fontSize = 90;
+                displayValue = face;
+                multiplier = 10;
+                // Text effect reset
+                if (multiplierText != null)
+                {
+                    multiplierText.color = Color.white;
+                    multiplierText.fontSize = 90;
+                }
+
+                if (pointText != null)
+                {
+                    pointText.color = Color.white;
+                    pointText.fontSize = 90;
+                }
             }
         }
-
         Debug.Log("face number is: " + face);
         Showtoltalpoint();
+
     }
 
     private void Showtoltalpoint()
@@ -165,6 +180,11 @@ public class Point : MonoBehaviour
             pointText.color = Color.white;
             pointText.fontSize = 80;
         }
+        pointText.text = ""; 
+        multiplierText.text = "";
+        totalText.text = "";
+        multiplicationsignText.text = "";
+        equalsignText.text = "";
 
 
     }

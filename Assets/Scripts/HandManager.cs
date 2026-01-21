@@ -12,23 +12,34 @@ public class HandManager : MonoBehaviour
     [SerializeField] private List<GameObject> cardPrefabs;
     [SerializeField] private SplineContainer splinecontainer;
     [SerializeField] private Transform cardspawnppoint;
-
+    [SerializeField] private int MaxSelectedHand;
+  
     public List<GameObject> handCards = new();
     [SerializeField] private List<Transform> targetPositions; // size = 2
     [SerializeField] private float moveDuration = 1f;
 
     public List<Cards> selectedCards = new();
     public static HandManager Instance;
-
+   
     public RollDice dice;
     public bool ischoosecard;
-
+    public PointController pointcontroller;
+    //UI Panel
+    public GameObject panel;
+    public GameObject textfirst;
+    public GameObject textsecond;
 
     void Start()
     {
         StartCoroutine(DrawCardsRoutine(MaxHandSize));
         ischoosecard=true;
-         
+        pointcontroller=FindAnyObjectByType<PointController>();
+        panel.SetActive(true);
+        textfirst.SetActive(true);
+        textsecond.SetActive(false);
+        MaxSelectedHand =2;
+       
+
     }
     private void Awake()
     {
@@ -43,12 +54,18 @@ public class HandManager : MonoBehaviour
         {
             HandleClick();
         }
+        if (selectedCards.Count == MaxSelectedHand)
+        {
+            
+            panel.SetActive(false);
+        }
         
+
     }
 
     void HandleClick()
     {
-        /*if (selectedCards.Count >= 2) return*/;
+        if (selectedCards.Count >= MaxSelectedHand) return;
 
         Ray ray = Camera.main.ScreenPointToRay(
             Mouse.current.position.ReadValue()
@@ -58,13 +75,18 @@ public class HandManager : MonoBehaviour
         {
             Cards card = hit.collider.GetComponent<Cards>();
             if (card == null || card.IsSelected) return;
-            if (dice.turn == 3)
+            if (pointcontroller.turn == 3)
             {
+               
+                
                 SelectCard(card, 3);
+                
             }
-            else if(dice.turn == 0)
+            else if(pointcontroller.turn == 0)
             {
+
                 SelectCard(card, 2);
+                
             }
         }
     }
@@ -72,7 +94,7 @@ public class HandManager : MonoBehaviour
     void SelectCard(Cards card,int turn)
     {
         card.transform.DOMoveY(card.transform.position.y + 1.5f, 0.15f);
-
+        card.Ready(false);
         card.Select();
         card.Flip(true);
         
@@ -84,11 +106,19 @@ public class HandManager : MonoBehaviour
         {
             
 
-            
             Invoke(nameof(ResolveSelection), 0.6f);
-         
+            
         }
+    
 
+    }
+    public void ReadyCard(bool value)
+    {
+        foreach (var card in selectedCards)
+        {
+            Cards cardComponent = card.GetComponent<Cards>();
+            cardComponent.Ready(value);
+        }
     }
     void ResolveSelection()
     {
@@ -100,9 +130,9 @@ public class HandManager : MonoBehaviour
                 targetPositions[i].position,
                 moveDuration
             );
-            
+      
             //targetPositions.RemoveAt(i);
-            
+
         }
         StartCoroutine(RemoveSelectedCardsRoutine());
 
@@ -177,10 +207,11 @@ public class HandManager : MonoBehaviour
         GameObject prefab = cardPrefabs[randomIndex];
         GameObject newCard = Instantiate(cardPrefabs[randomIndex], splinecontainer.transform);
         newCard.transform.position = cardspawnppoint.position;
-        newCard.transform.localScale *=0.85f;
+        newCard.transform.localScale *=0.75f;
         Cards cardComponent = newCard.GetComponent<Cards>();
         cardComponent.SourcePrefab  = prefab;
         handCards.Add(newCard);
+
         UpdateCardPositions();
     }
 
@@ -217,10 +248,14 @@ public class HandManager : MonoBehaviour
 
     public void OnPointAnimationFinished()
     {
-        if (dice.turn == 3 && ischoosecard)
+        if (pointcontroller.turn == 3 && ischoosecard)
         {
+           
+            panel.SetActive(true);
+            textfirst.SetActive(false);
+            textsecond.SetActive(true);
+            MaxSelectedHand = 3;
             
-
             ClearHand();
             StartCoroutine(DrawCardsRoutine(MaxHandSize));
             ischoosecard = false;

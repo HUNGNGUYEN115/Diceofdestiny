@@ -5,6 +5,9 @@ using UnityEngine.Audio;
 public class RollDice : MonoBehaviour
 {
     Rigidbody rb;
+  
+    PointController pointcontroller;
+
     public float maxrandomforcevalue;
     public float rollingforce;
     private float forcex,forcey, forcez;
@@ -19,7 +22,7 @@ public class RollDice : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip dicesound;
 
-    public int turn = 0;
+
 
     private void Start()
     {
@@ -27,14 +30,17 @@ public class RollDice : MonoBehaviour
         
         transform.rotation = Quaternion.Euler(Random.Range(0f, 360f),Random.Range(0f, 360f),Random.Range(0f, 360f) );
         Isrolled =false;
-        
+       
+        pointcontroller = FindAnyObjectByType<PointController>();
 
     }
     public void RollTheDice()
     {   // Prevent new rolls while counting
-
         if (IsCountingAnimation) return;
-        Point.instance.ResetUI();
+        //Point.instance.ResetUI();
+        pointcontroller.turn++;
+        pointcontroller.ResetAll();
+        HandManager.Instance.ReadyCard(true);
         Iscount = true;
         //disable rolling if the dice is still moving
         if (rb.linearVelocity.magnitude > 0.1f ||rb.angularVelocity.magnitude > 0.1f)
@@ -53,9 +59,9 @@ public class RollDice : MonoBehaviour
         
         Isrolled = true;
       
-        turn++;
         
-        
+
+
 
 
 

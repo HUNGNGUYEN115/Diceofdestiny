@@ -29,7 +29,7 @@ public class CardManager : MonoBehaviour
         for (int i = 0; i < deck.Count; i++)
         {
 
-            if (dice.facenum == deck[i].cardData.cardnum && dice.Isrolled && !dice.Iscount)
+            if (dice.facenum == deck[i].cardData.cardnum && dice.Isrolled && !dice.Iscount && deck[i].IsReady)
             {
                 
                 deck[i].CardFeedback();

@@ -15,6 +15,7 @@ public class Cards : MonoBehaviour
     public float moveUpDistance = 10f;
     public float moveDuration = 0.2f;
     private bool isAnimating = false;
+    public bool isActivate = true;
     private Vector3 startPos;
     public Vector3 vfxoffset;
     public AudioSource audioSource;
@@ -23,6 +24,7 @@ public class Cards : MonoBehaviour
     public GameObject SourcePrefab { get; set; }
     public bool IsFaceUp { get; private set; }
     public bool IsSelected { get; private set; }
+    public bool IsReady { get; private set; }
 
     private void Start()
     {
@@ -55,9 +57,13 @@ public class Cards : MonoBehaviour
     {
         IsSelected = false;
     }
+    public void Ready(bool value)
+    {
+        IsReady = value;
+    }
 
 
- 
+
 
 
 
@@ -67,12 +73,14 @@ public class Cards : MonoBehaviour
 
         if (isAnimating) return;
 
-       
+       if(!isActivate) return;
+        if (!IsReady) return;
         GameObject instance = Instantiate(cardData.vfx, transform.position + vfxoffset, Quaternion.identity);
         audioSource.PlayOneShot(cardData.audioClip);
         Destroy(instance, cardData.vfx.GetComponent<ParticleSystem>().main.duration);
         startPos = transform.position;
         StartCoroutine(MoveUp());
+        isActivate = false;
 
 
 

@@ -7,10 +7,12 @@ public class FaceDetector : MonoBehaviour
     RollDice dice;
     //Conditions for checking when the dice is stopped
     private const float Threshold = 0.05f;
- 
+    PointController point;
+
     void Start()
     {
         dice=FindAnyObjectByType<RollDice>();
+        point=FindAnyObjectByType<PointController>();
     }
 
    
@@ -24,7 +26,7 @@ public class FaceDetector : MonoBehaviour
             dice.GetComponent<Rigidbody>().angularVelocity.sqrMagnitude < Threshold * Threshold)
             {
                 dice.facenum=int.Parse(other.gameObject.name);
-                Point.instance.Checkface(dice.facenum);
+                point.CheckFace(dice.facenum);
 
                 dice.Iscount = false;
             }
