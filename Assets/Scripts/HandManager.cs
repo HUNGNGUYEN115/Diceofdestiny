@@ -24,22 +24,22 @@ public class HandManager : MonoBehaviour
     public RollDice dice;
     public bool ischoosecard;
     public PointController pointcontroller;
+    public GameManager gamemanager;
     //UI Panel
-    public GameObject panel;
-    public GameObject textfirst;
-    public GameObject textsecond;
+    //public GameObject panel;
+    //public GameObject textfirst;
+    //public GameObject textsecond;
 
     void Start()
     {
         StartCoroutine(DrawCardsRoutine(MaxHandSize));
-        ischoosecard=true;
+        
+        ischoosecard =true;
         pointcontroller=FindAnyObjectByType<PointController>();
-        panel.SetActive(true);
-        textfirst.SetActive(true);
-        textsecond.SetActive(false);
+   
         MaxSelectedHand =2;
        
-
+        gamemanager=FindAnyObjectByType<GameManager>();
     }
     private void Awake()
     {
@@ -48,25 +48,28 @@ public class HandManager : MonoBehaviour
 
     private void Update()
     {
-
+        
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+           
             HandleClick();
         }
         if (selectedCards.Count == MaxSelectedHand)
         {
             
-            panel.SetActive(false);
+            gamemanager.CloseChoosePanel();
         }
         
+       
 
     }
 
     void HandleClick()
     {
+        
         if (selectedCards.Count >= MaxSelectedHand) return;
-
+        
         Ray ray = Camera.main.ScreenPointToRay(
             Mouse.current.position.ReadValue()
         );
@@ -93,6 +96,11 @@ public class HandManager : MonoBehaviour
  
     void SelectCard(Cards card,int turn)
     {
+        if (handCards.Count >= MaxHandSize)
+        {
+            dice.Ishandingcard = false;
+        }
+        if (dice.Ishandingcard) return;     
         card.transform.DOMoveY(card.transform.position.y + 1.5f, 0.15f);
         card.Ready(false);
         card.Select();
@@ -179,6 +187,7 @@ public class HandManager : MonoBehaviour
             
             yield return new WaitForSeconds(0.25f); // delay between cards
         }
+        dice.Ishandingcard = false;
     }
     private void DrawCard()
     {
@@ -211,8 +220,10 @@ public class HandManager : MonoBehaviour
         Cards cardComponent = newCard.GetComponent<Cards>();
         cardComponent.SourcePrefab  = prefab;
         handCards.Add(newCard);
-
+        
         UpdateCardPositions();
+        
+
     }
 
 
@@ -229,6 +240,7 @@ public class HandManager : MonoBehaviour
 
             // Remove prefab from future draws
             cardPrefabs.Remove(card.SourcePrefab);
+           
 
 
         }
@@ -250,16 +262,29 @@ public class HandManager : MonoBehaviour
     {
         if (pointcontroller.turn == 3 && ischoosecard)
         {
-           
-            panel.SetActive(true);
-            textfirst.SetActive(false);
-            textsecond.SetActive(true);
-            MaxSelectedHand = 3;
+           dice.Ishandingcard = true;
+            StartCoroutine(WaitTheTurn(2f));
             
-            ClearHand();
-            StartCoroutine(DrawCardsRoutine(MaxHandSize));
-            ischoosecard = false;
         }
+        else
+        {
+            dice.Ishandingcard = false;
+        }
+    }
+    IEnumerator WaitTheTurn(float waitTime)
+
+    { 
+        yield return new WaitForSeconds(waitTime);
+      
+        gamemanager.OpenChoosePanel();
+        MaxSelectedHand = 3;
+
+        ClearHand();
+        StartCoroutine(DrawCardsRoutine(MaxHandSize));
+        ischoosecard = false;
+        
+
+
     }
 
 

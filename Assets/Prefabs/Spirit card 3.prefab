@@ -51,6 +51,7 @@ MonoBehaviour:
   cardData: {fileID: 11400000, guid: 75cbb95d6810b0c4ca98d4f87d147e61, type: 2}
   moveUpDistance: 1
   moveDuration: 0.5
+  isActivate: 1
   vfxoffset: {x: 0, y: 1.17, z: 0}
   audioSource: {fileID: 7532698814306061178}
 --- !u!65 &2840389235223201117

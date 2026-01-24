@@ -15,7 +15,8 @@ public class RollDice : MonoBehaviour
     public bool Iscount = false;
     public bool Isrolled;
     public bool IsCountingAnimation;
-  
+    public bool Isendgame;
+    public bool Ishandingcard;
 
     public CardManager cardManager;
 
@@ -32,11 +33,13 @@ public class RollDice : MonoBehaviour
         Isrolled =false;
        
         pointcontroller = FindAnyObjectByType<PointController>();
-
+        Ishandingcard = true;
     }
     public void RollTheDice()
-    {   // Prevent new rolls while counting
+    {   // Prevent new rolls while counting handing cards or end the game
         if (IsCountingAnimation) return;
+        if(Isendgame) return;
+        if (Ishandingcard) return;
         //Point.instance.ResetUI();
         pointcontroller.turn++;
         pointcontroller.ResetAll();
@@ -58,8 +61,10 @@ public class RollDice : MonoBehaviour
         rb.AddTorque(forcex, forcey, forcez);
         
         Isrolled = true;
-      
+        Ishandingcard = true;
         
+
+
 
 
 
@@ -69,6 +74,7 @@ public class RollDice : MonoBehaviour
 
     void Update()
     {
+        
         // Dice is rolling  do nothing
         if (!Isrolled) return;
        

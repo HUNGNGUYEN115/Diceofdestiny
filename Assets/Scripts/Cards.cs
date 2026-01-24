@@ -6,10 +6,12 @@ using DG.Tweening;
 public class Cards : MonoBehaviour
 {
     public CardData cardData;
-   
 
-  
-
+    // Visual components
+    private MeshRenderer[] renderers;
+    private Material[] runtimeMaterials;
+    private Color[] originalColors;
+    public int colorchange;
 
     // Feedback affect 
     public float moveUpDistance = 10f;
@@ -26,11 +28,27 @@ public class Cards : MonoBehaviour
     public bool IsSelected { get; private set; }
     public bool IsReady { get; private set; }
 
+
+    private void Awake()
+
+    {
+        renderers = GetComponentsInChildren<MeshRenderer>(true);
+
+        runtimeMaterials = new Material[renderers.Length];
+        originalColors = new Color[renderers.Length];
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            runtimeMaterials[i] = renderers[i].material;
+            originalColors[i] = runtimeMaterials[i].color;
+        }
+        
+    }
     private void Start()
     {
-       
-       
-       
+
+        colorchange = 40;
+
 
     }
 
@@ -60,6 +78,26 @@ public class Cards : MonoBehaviour
     public void Ready(bool value)
     {
         IsReady = value;
+    }
+    IEnumerator DectivateCard()
+    {
+        for (int i = 0; i < runtimeMaterials.Length; i++)
+        {
+            float t = 0f;
+            Color start = runtimeMaterials[i].color;
+            Color target = new Color(colorchange/255f, colorchange/255f, colorchange / 255f, start.a);
+
+            while (t < 0.5f)
+            {
+                t += Time.deltaTime;
+                runtimeMaterials[i].color = Color.Lerp(start, target, t);
+                yield return null;
+            }
+            //runtimeMaterials[i].color = originalColors[i] * 0.6f;
+            //runtimeMaterials[i].DisableKeyword("_EMISSION");
+            
+        }
+
     }
 
 
@@ -110,7 +148,9 @@ public class Cards : MonoBehaviour
 
         transform.position = startPos;
         isAnimating = false;
-        
+        //DectivateCard();
+        StartCoroutine(DectivateCard());
+
 
     }
 

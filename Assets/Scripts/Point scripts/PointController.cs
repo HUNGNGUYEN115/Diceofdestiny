@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using UnityEngine;
@@ -69,9 +70,12 @@ public class PointController : MonoBehaviour
         ui.StartCount(this, calculator.Total, () =>
         {
             dice.IsCountingAnimation = false;
+            
             HandManager.Instance.OnPointAnimationFinished();
+
         });
     }
+
 
     void AddHistory(int value)
     {

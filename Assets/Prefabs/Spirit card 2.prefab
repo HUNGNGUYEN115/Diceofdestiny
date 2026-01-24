@@ -425,8 +425,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cards
   cardData: {fileID: 11400000, guid: 2cc76fde7a2b0c3468580874342838e5, type: 2}
+  colorchange: 73
   moveUpDistance: 1
   moveDuration: 0.5
+  isActivate: 1
   vfxoffset: {x: 0, y: 1.17, z: 0}
   audioSource: {fileID: 7885883512991382754}
 --- !u!65 &3418053395310255215
