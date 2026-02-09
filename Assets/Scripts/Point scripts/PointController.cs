@@ -34,7 +34,9 @@ public class PointController : MonoBehaviour
 
         ui.ResetStyle();
         ui.ShowRoll(calculator.DisplayValue, calculator.Multiplier);
-        if(calculator.matchedCard)
+
+        //ui.ShowFinalPoint(calculator.finalpoint);
+        if (calculator.matchedCard)
         {
             switch (face)
             {
@@ -63,19 +65,41 @@ public class PointController : MonoBehaviour
             ui.ResetStyle();
         }
 
-        AddHistory(calculator.Total);
-
+        //AddHistory(calculator.Total);
+       
         dice.IsCountingAnimation = true;
 
-        ui.StartCount(this, calculator.Total, () =>
+        //ui.StartCount(this, calculator.Total,calculator.finalpoint, () =>
+        //{
+
+        //    calculator.StoreLastPoint(calculator.Total);
+
+        //    HandManager.Instance.OnPointAnimationFinished();
+        //    dice.IsCountingAnimation = false;
+
+        //});
+        calculator.StoreLastPoint(calculator.Total);
+        StartCoroutine(ui.CountTotal(calculator.Total, calculator.finalpoint, () =>
         {
-            dice.IsCountingAnimation = false;
             
             HandManager.Instance.OnPointAnimationFinished();
+            dice.IsCountingAnimation = false;
+            if (turn >= 6)
+            {
+                SaveHighScore();
+                //HighScoreManager.ResetHighScores();
+            }
+        }
+        ));
 
-        });
+        //dice.IsCountingAnimation = false;
     }
-
+    void SaveHighScore()
+    {
+        HighScoreManager.SaveScore(calculator.finalpoint);
+        HighScoreManager.SaveNames(UserData.instance.PlayerName);
+        Debug.Log("High name saved: " + UserData.instance.PlayerName);
+    }
 
     void AddHistory(int value)
     {

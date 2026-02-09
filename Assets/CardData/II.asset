@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: II
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardnum: 2
-  vfx: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
+  vfx: {fileID: 737781681216887265, guid: 1075fa62a415b634bb559068255c7a79, type: 3}
   audioClip: {fileID: 8300000, guid: 5257b73575238ba43aa4844c88fb6eda, type: 3}
+  UItextute: {fileID: 2800000, guid: 7d664850fb202de41ac1a3cf09a578f7, type: 3}

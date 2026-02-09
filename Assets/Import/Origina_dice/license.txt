@@ -1,0 +1,11 @@
+Model Information:
+* title:	Origina dice
+* source:	https://sketchfab.com/3d-models/origina-dice-8bddad37f96a48e6aa50742f326c8555
+* author:	YellowAstra (https://sketchfab.com/YellowAstra)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Origina dice" (https://sketchfab.com/3d-models/origina-dice-8bddad37f96a48e6aa50742f326c8555) by YellowAstra (https://sketchfab.com/YellowAstra) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

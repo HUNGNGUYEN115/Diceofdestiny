@@ -6,7 +6,9 @@ public class PointCalculator
     public int Multiplier { get; private set; } = 10;
     public int DisplayValue { get; private set; }
     public bool matchedCard { get; private set; }
-    
+
+    public int finalpoint { get; private set; } = 0;
+
     public int ApplyFace(int face, List<Cards> selectedCards)
     {
         // Default values
@@ -66,6 +68,7 @@ public class PointCalculator
 
         int gained = DisplayValue * Multiplier;
         Total += gained;
+        //StoreLastPoint();
         return gained;
     }
 
@@ -75,4 +78,13 @@ public class PointCalculator
         Multiplier = 10;
         DisplayValue = 0;
     }
+
+
+    public void StoreLastPoint(int total)
+    {
+        finalpoint += total;
+    }
+
+
+
 }
