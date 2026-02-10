@@ -38,7 +38,7 @@ public class PointUI : MonoBehaviour
     }
     public void ShowFinalPoint(int finalpoint)
     {
-        finalpointText.text = "Final Point: " + finalpoint;
+        finalpointText.text = "Score: " + finalpoint;
     }
 
     public void SetPositivePoint()
@@ -86,8 +86,8 @@ public class PointUI : MonoBehaviour
         while (current <= target)
         {
             totalText.text = "<grow>" + current;
+            audioSource.PlayOneShot(tickSound);
 
-        
             current++;
             yield return new WaitForSeconds(0.03f);
         }

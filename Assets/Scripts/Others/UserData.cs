@@ -33,6 +33,9 @@ public class UserData : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        playerName = name.text;
+        if (name != null)
+            playerName = name.text;
+        else
+            playerName = "xxx";
     }
 }

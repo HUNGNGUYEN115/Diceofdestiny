@@ -25,10 +25,10 @@ public class HandManager : MonoBehaviour
     public bool ischoosecard;
     public PointController pointcontroller;
     public GameManager gamemanager;
-    //UI Panel
-    //public GameObject panel;
-    //public GameObject textfirst;
-    //public GameObject textsecond;
+
+    public AudioSource audioSource;
+    public AudioClip cardflip;
+    public AudioClip carddraw;
 
     void Start()
     {
@@ -118,7 +118,7 @@ public class HandManager : MonoBehaviour
         card.Flip(true);
         
         selectedCards.Add(card);
-       
+        audioSource.PlayOneShot(cardflip);
         Tween flipTween = card.Flip(true);
 
         if (selectedCards.Count == turn)
@@ -128,7 +128,8 @@ public class HandManager : MonoBehaviour
             Invoke(nameof(ResolveSelection), 0.6f);
             
         }
-    
+        
+
 
     }
     public void ReadyCard(bool value)
@@ -163,6 +164,7 @@ public class HandManager : MonoBehaviour
             {
                 card.Flip(false);
                 card.transform.DOMove(cardspawnppoint.position, moveDuration);
+               
             }
         }
     }
@@ -195,7 +197,8 @@ public class HandManager : MonoBehaviour
             
                 DrawCard();
             
-            
+           
+
             yield return new WaitForSeconds(0.25f); // delay between cards
         }
         dice.Ishandingcard = false;
@@ -214,9 +217,12 @@ public class HandManager : MonoBehaviour
             {
                 if (card.name.StartsWith(cardPrefabs[i].name)) // prefab match
                 {
+
                     inHand = true;
                     break;
+
                 }
+
             }
             if (!inHand) availableIndexes.Add(i);
         }
@@ -231,7 +237,8 @@ public class HandManager : MonoBehaviour
         Cards cardComponent = newCard.GetComponent<Cards>();
         cardComponent.SourcePrefab  = prefab;
         handCards.Add(newCard);
-        
+        audioSource.PlayOneShot(carddraw);
+        Debug.Log("Card drawn: ");
         UpdateCardPositions();
         
 

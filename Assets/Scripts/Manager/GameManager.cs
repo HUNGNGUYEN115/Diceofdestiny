@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +15,19 @@ public class GameManager : MonoBehaviour
     public GameObject endpanel;
     public TMP_Text nametext;
     public TMP_Text scoretext;
+
+    private bool isPlayedsound = true;
+
+
+    private InputAction Delete;
+    public PlayerInputSystem controls;
+
+    public AudioSource audioSource;
+    public AudioClip endgameclip;
+    private void Awake()
+    {
+        controls = new PlayerInputSystem();
+    }
     void Start()
     {
         dice = FindAnyObjectByType<RollDice>();
@@ -23,7 +37,7 @@ public class GameManager : MonoBehaviour
         choosepanel.SetActive(true);
         dice.Isendgame = false;
 
-
+       
 
     }
 
@@ -37,7 +51,14 @@ public class GameManager : MonoBehaviour
             {
                 StartCoroutine(EndGame());
                 Debug.Log("End");
-                nametext.text = "Nice roll " + UserData.instance.PlayerName + "!!!";
+                if (UserData.instance.PlayerName!=null)
+                {
+                    nametext.text = "Nice roll " + UserData.instance.PlayerName + "!!!";
+                }
+                else
+                {
+                    nametext.text = "Nice roll xxx !!!";
+                }
                 scoretext.text = pointController.calculator.finalpoint.ToString();
 
             }
@@ -61,12 +82,57 @@ public class GameManager : MonoBehaviour
         endpanel.SetActive(true);
         textfirst.SetActive(false);
         textsecond.SetActive(false);
+        PlayMusic();
+
+
 
     }
     IEnumerator EndGame()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(2f);
         OpenEndPanel();
     }
+    public void PlayMusic()
+            {
+        if (isPlayedsound)
+            {
+                    
+                    audioSource.volume = 0.8f;
+            audioSource.PlayOneShot(endgameclip);
+                    
+            
+            
+        }
+        isPlayedsound = false;
+    }
+    private void OnEnable()
+    {
+        Delete = controls.Player.Delete;
+        if (Delete != null)
+        {
+            Delete.Enable();
+            Delete.performed += OnDeletePressed;
+        }
+        else
+        {
+            Debug.LogWarning("Delete action not found in Input Actions.");
+        }
+    }
 
+
+    private void OnDisable()
+    {
+        if (Delete != null)
+        {
+            Delete.performed -= OnDeletePressed;
+            Delete.Disable();
+        }
+    }
+
+
+    public void OnDeletePressed(InputAction.CallbackContext context)
+    {
+        HighScoreManager.ResetHighScores();
+        Debug.Log("High scores reset.");
+    }
 }

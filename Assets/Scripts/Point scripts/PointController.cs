@@ -89,6 +89,11 @@ public class PointController : MonoBehaviour
                 SaveHighScore();
                 //HighScoreManager.ResetHighScores();
             }
+            //if (turn >= 1)
+            //{
+
+            //    //HighScoreManager.ResetHighScores();
+            //}
         }
         ));
 
