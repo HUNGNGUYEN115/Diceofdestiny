@@ -55,38 +55,28 @@ Shader "Custom/BoxBlur"
                 return OUT;
             }
 
-            half4 frag (Varyings IN) : SV_Target
-            {
-                float4 blurred = 0.0;
+half4 frag (Varyings IN) : SV_Target
+{
+    float2 uv = IN.screenPos.xy / IN.screenPos.w;
+    float2 texel = _Scale / _ScreenParams.xy;
 
-                float2 uv = IN.screenPos.xy / IN.screenPos.w;
-                float2 texel = _Scale * (1.0 / _ScreenParams.xy);
+    half4 col = 0;
 
-                int blurSize = max(_Blur, 1);
-                int sampleCount = (2 * blurSize + 1) * (2 * blurSize + 1);
+    col += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
+    col += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv + texel);
+    col += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv - texel);
+    col += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv + float2(texel.x, -texel.y));
+    col += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv + float2(-texel.x, texel.y));
 
-                for (int x = -blurSize; x <= blurSize; x++)
-                {
-                    for (int y = -blurSize; y <= blurSize; y++)
-                    {
-                        blurred += SAMPLE_TEXTURE2D(
-                            _CameraOpaqueTexture,
-                            sampler_CameraOpaqueTexture,
-                            uv + float2(x, y) * texel
-                        );
-                    }
-                }
+    col *= 0.2;
 
-                blurred /= sampleCount;
+    float3 tinted = col.rgb * _ColorTint.rgb;
+    float strength = saturate(_ColorTint.a);
 
-                // Apply tint using alpha as strength
-                float3 tinted = blurred.rgb * _ColorTint.rgb;
-                float strength = saturate(_ColorTint.a);
+    float3 finalColor = lerp(col.rgb, tinted, strength);
 
-                float3 finalColor = lerp(blurred.rgb, tinted, strength);
-
-                return half4(finalColor, 1.0);
-            }
+    return half4(finalColor, 1);
+}
             ENDHLSL
         }
     }

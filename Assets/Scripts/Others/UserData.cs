@@ -6,7 +6,7 @@ public class UserData : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public static UserData instance;
-    public TMP_InputField name;
+    public TMP_InputField nameInputField;
     private string playerName;
     public string PlayerName
     {
@@ -24,18 +24,27 @@ public class UserData : MonoBehaviour
         {
             Destroy(gameObject);
         }
+       
+
     }
     void Start()
     {
-       
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (name != null)
-            playerName = name.text;
+        nameInputField = FindAnyObjectByType<TMP_InputField>();
+        if (nameInputField == null) return;
+        if (!string.IsNullOrEmpty(nameInputField.text))
+        {
+            playerName = nameInputField.text;
+        }
         else
+        {
             playerName = "xxx";
+        }
+
     }
 }

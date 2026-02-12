@@ -153,11 +153,19 @@ public class PointUI : MonoBehaviour
         for (int i = 0; i < nameTexts.Length; i++)
         {
             if (i < names.Count)
+            {
                 nameTexts[i].text = $"{names[i]}";
-            else if (names==null)
-                nameTexts[i].text = $"xxx";
+                Debug.Log($"Name {i}: {names[i]}");
+            }
+                
             else
-                nameTexts[i].text = $"---";
+            {
+                nameTexts[i].text = $"xxx";
+                Debug.Log($"No name");
+            }
+                
+            //else
+            //    nameTexts[i].text = $"---";
         }
     }
 
